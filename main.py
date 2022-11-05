@@ -1,5 +1,14 @@
 import sys
 sys.setrecursionlimit(100000000)
+# IDEA: We will use range trees
+# For construction of the Range Tree we will compare the points as tuples (first 'x' then 'y')
+# We have the theory of a range tree: 
+# Each node will represent the the set of all the 'points' that are 'leaves' of the subtree at that point
+# Each point contains a reference to an array of points represented by that point (the set explained above)
+# Using the search query for the range tree, we first locate the points that are valid by 'x'
+# this takes log(n) time and for each SURE set (by x) we do binary seach on it's array (sorted by y) to
+# locate the 'y' points. This in the worst case take log(n)*log(n) time  + the time required for pushing the
+# valid range into the answer
 
 class PointDatabase:
     class Node:
@@ -16,7 +25,8 @@ class PointDatabase:
         self.data = pointlist
         self.root = self.build_tree(pointlist, 0, len(pointlist)-1)
         self.add_ylis(self.root)
-    def merge_lis(self,P,Q):
+    
+    def merge_lis(self,P,Q): # we construct the 'y' sorted lists bottom to top. This take O(nlog(n)) time
         L = [None]*(len(P)+len(Q))
         i,j,t=0,0,0
         while i< len(P) and j<len(Q):
@@ -43,13 +53,14 @@ class PointDatabase:
     def give_root(self):
         return self.root
 
-    def build_tree(self, L, s, e):
+    def build_tree(self, L, s, e): 
         if len(L) == 0:
             return None
         if s == e:
             return self.Node(L[s][0],L[s], None, None, 1)
 
-        # else:
+        # else: # the construction using the 'median' ensures that the tree is Almost complete except for 
+        # the last level so it has height O(log(n))
         mid = (s+e)//2
         return self.Node(L[mid][0], L[mid],self.build_tree(L, s, mid), self.build_tree(L, mid+1, e), e-s+1)
         # mid+1 is always strictly > (s+e)//2 and <= e  for (length >=2)
