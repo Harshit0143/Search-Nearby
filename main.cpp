@@ -163,7 +163,6 @@ public:
   vector<pair<int, int>> search_near_points(int x, int y, int d_max)
   {
     answer.resize(0);
-    cout << "Querying for: " << x << ' ' << y << ' ' << d_max << '\n';
     make_query(x, y, d_max, 0, 0, n - 1);
     sort(answer.begin() , answer.end());
     print(answer);
